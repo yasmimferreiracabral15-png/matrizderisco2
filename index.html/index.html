@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Risco - Consulta Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 24px;
+        }
+        
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .user-info i {
+            font-size: 18px;
+        }
+        
+        /* Search Section */
+        .search-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin: 20px 0;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .search-box button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-box button:hover {
+            background-color: #2980b9;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        
+        /* Quick Access */
+        .quick-access {
+            margin: 20px 0;
+        }
+        
+        .quick-access h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: var(--dark);
+        }
+        
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .quick-btn:hover {
+            background-color: var(--light);
+            transform: translateY(-2px);
+        }
+        
+        .quick-btn.active {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+        
+        /* Results */
+        .results-section {
+            margin: 20px 0;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .results-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .sort-options select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .risk-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .risk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .risk-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .risk-level {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .risk-alto {
+            background-color: var(--danger);
+        }
+        
+        .risk-medio {
+            background-color: var(--warning);
+        }
+        
+        .risk-baixo {
+            background-color: var(--success);
+        }
+        
+        .risk-content {
+            padding: 15px;
+        }
+        
+        .risk-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .risk-details {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .risk-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .risk-actions {
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+        
+        .action-btn:hover {
+            color: var(--secondary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: modalOpen 0.3s;
+        }
+        
+        @keyframes modalOpen {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            color: var(--dark);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .risk-detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .risk-detail-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--dark);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: var(--secondary);
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .filter-options {
+                flex-direction: column;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>Matriz de Risco Digital</h1>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Operador</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Digite o nome da atividade ou risco...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label for="areaFilter">Área</label>
+                    <select id="areaFilter">
+                        <option value="">Todas as áreas</option>
+                        <option value="Manutenção Mecânica">Manutenção Mecânica</option>
+                        <option value="Manutenção Elétrica">Manutenção Elétrica</option>
+                        <option value="Operação">Operação</option>
+                        <option value="Laboratório">Laboratório</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="riskFilter">Nível de Risco</label>
+                    <select id="riskFilter">
+                        <option value="">Todos os níveis</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Baixo">Baixo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="locationFilter">Localização</label>
+                    <select id="locationFilter">
+                        <option value="">Todas as localizações</option>
+                        <option value="Forno de Pozolana">Forno de Pozolana</option>
+                        <option value="Ensacadeira">Ensacadeira</option>
+                        <option value="Moagem de Cimento">Moagem de Cimento</option>
+                        <option value="Moagem de Coque">Moagem de Coque</option>
+                        <option value="Tombador">Tombador</option>
+                        <option value="ADM">ADM</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        
+        <section class="quick-access">
+            <h2>Acesso Rápido</h2>
+            <div class="quick-buttons">
+                <button class="quick-btn active" data-area=""><i class="fas fa-layer-group"></i> Todos</button>
+                <button class="quick-btn" data-area="Manutenção Mecânica"><i class="fas fa-tools"></i> Manutenção Mecânica</button>
+                <button class="quick-btn" data-area="Manutenção Elétrica"><i class="fas fa-bolt"></i> Manutenção Elétrica</button>
+                <button class="quick-btn" data-area="Operação"><i class="fas fa-industry"></i> Operação</button>
+                <button class="quick-btn" data-area="Laboratório"><i class="fas fa-flask"></i> Laboratório</button>
+            </div>
+        </section>
+        
+        <section class="results-section">
+            <div class="results-header">
+                <h2>Resultados da Busca</h2>
+                <div class="results-count" id="resultsCount">0 atividades encontradas</div>
+                <div class="sort-options">
+                    <select id="sortSelect">
+                        <option value="name">Ordenar por Nome</option>
+                        <option value="risk">Ordenar por Risco</option>
+                        <option value="area">Ordenar por Área</option>
+                    </select>
+                </div>
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Os cards de risco serão inseridos aqui via JavaScript -->
+            </div>
+        </section>
+    </div>
+    
+    <!-- Modal para detalhes do risco -->
+    <div class="modal" id="riskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detalhes do Risco</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo do modal será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navegação inferior -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="search">
+            <i class="fas fa-search"></i>
+            <span>Consultar</span>
+        </div>
+        <div class="nav-item" data-page="favorites">
+            <i class="fas fa-star"></i>
+            <span>Favoritos</span>
+        </div>
+        <div class="nav-item" data-page="recent">
+            <i class="fas fa-history"></i>
+            <span>Recentes</span>
+        </div>
+        <div class="nav-item" data-page="about">
+            <i class="fas fa-info-circle"></i>
+            <span>Sobre</span>
+        </div>
+    </div>
+
+    <script>
+        // Dados da matriz de risco (exemplo com alguns dados do JSON fornecido)
+        const riskData = [
+            {
+                id: "I-1",
+                area: "Manutenção Mecânica",
+                location: "Forno de Pozolana",
+                activity: "Aplic. Grafite Alianças Forno",
+                risk: "Exposição à Ruído contínuo",
+                frequency: 4,
+                severity: 2,
+                score: 8,
+                riskLevel: "Baixo",
+                ppe: "Protetor auricular",
+                controls: "Manutenção preventiva de equipamentos, rodízio de funcionários",
+                legislation: "NR-15"
+            },
+            {
+                id: "I-14",
+                area: "Manutenção Mecânica",
+                location: "Forno de Pozolana",
+                activity: "Aplic. Grafite Alianças Forno",
+                risk: "Contato com Material/Produto Inflamável/Combustível (serviços de soldagem e corte)",
+                frequency: 4,
+                severity: 3,
+                score: 12,
+                riskLevel: "Médio",
+                ppe: "Luva de raspa, óculos de proteção, avental",
+                controls: "Área isolada, extintores disponíveis, treinamento específico",
+                legislation: "NR-23"
+            },
+            {
+                id: "I-188",
+                area: "Manutenção Mecânica",
+                location: "Ensacadeira",
+                activity: "Serviços a quente com conjunto oxiacetileno - Operação de Corte",
+                risk: "Exposição à Ruído contínuo",
+                frequency: 5,
+                severity: 4,
+                score: 20,
+                riskLevel: "Alto",
+                ppe: "Protetor auricular, óculos de proteção, luva de raspa",
+                controls: "Área delimitada, sinalização, treinamento específico, inspeção de equipamentos",
+                legislation: "NR-15, NR-23, PO-002110"
+            },
+            {
+                id: "I-52",
+                area: "Manutenção Mecânica",
+                location: "Ensacadeira",
+                activity: "Insp. Aplicador de Sacos - Semanal",
+                risk: "Exposição à Ruído contínuo",
+                frequency: 4,
+                severity: 3,
+                score: 12,
+                riskLevel: "Médio",
+                ppe: "Protetor auricular",
+                controls: "Manutenção preventiva, rodízio de funcionários",
+                legislation: "NR-15"
+            },
+            {
+                id: "I-103",
+                area: "Manutenção Mecânica",
+                location: "Moagem de Cimento",
+                activity: "Insp. Mancal Eixo Acionam",
+                risk: "Exposição à Ruído contínuo",
+                frequency: 4,
+                severity: 3,
+                score: 12,
+                riskLevel: "Médio",
+                ppe: "Protetor auricular",
+                controls: "Manutenção preventiva, enclausuramento acústico",
+                legislation: "NR-15"
+            },
+            {
+                id: "I-120",
+                area: "Manutenção Mecânica",
+                location: "Moagem de Coque",
+                activity: "Insp. Mancal Eixo Acionam",
+                risk: "Exposição à Ruído contínuo",
+                frequency: 4,
+                severity: 3,
+                score: 12,
+                riskLevel: "Médio",
+                ppe: "Protetor auricular",
+                controls: "Manutenção preventiva, rodízio de funcionários",
+                legislation: "NR-15"
+            }
+        ];
+
+        // Elementos DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const areaFilter = document.getElementById('areaFilter');
+        const riskFilter = document.getElementById('riskFilter');
+        const locationFilter = document.getElementById('locationFilter');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const resultsCount = document.getElementById('resultsCount');
+        const sortSelect = document.getElementById('sortSelect');
+        const quickButtons = document.querySelectorAll('.quick-btn');
+        const riskModal = document.getElementById('riskModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Estado da aplicação
+        let currentData = [...riskData];
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let recent = JSON.parse(localStorage.getItem('recent')) || [];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            displayResults(currentData);
+            setupEventListeners();
+        });
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', handleSearch);
+            searchButton.addEventListener('click', handleSearch);
+            areaFilter.addEventListener('change', handleFilter);
+            riskFilter.addEventListener('change', handleFilter);
+            locationFilter.addEventListener('change', handleFilter);
+            sortSelect.addEventListener('change', handleSort);
+            
+            quickButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    quickButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    areaFilter.value = this.dataset.area;
+                    handleFilter();
+                });
+            });
+            
+            closeModal.addEventListener('click', function() {
+                riskModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === riskModal) {
+                    riskModal.style.display = 'none';
+                }
+            });
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    handleNavigation(this.dataset.page);
+                });
+            });
+        }
+
+        // Manipular busca
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            if (searchTerm.length === 0) {
+                currentData = [...riskData];
+            } else {
+                currentData = riskData.filter(item => 
+                    item.activity.toLowerCase().includes(searchTerm) || 
+                    item.risk.toLowerCase().includes(searchTerm) ||
+                    item.location.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            applyFilters();
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            let filteredData = [...currentData];
+            
+            const areaValue = areaFilter.value;
+            if (areaValue) {
+                filteredData = filteredData.filter(item => item.area === areaValue);
+            }
+            
+            const riskValue = riskFilter.value;
+            if (riskValue) {
+                filteredData = filteredData.filter(item => item.riskLevel === riskValue);
+            }
+            
+            const locationValue = locationFilter.value;
+            if (locationValue) {
+                filteredData = filteredData.filter(item => item.location === locationValue);
+            }
+            
+            handleSort(null, filteredData);
+        }
+
+        // Manipular filtros
+        function handleFilter() {
+            applyFilters();
+        }
+
+        // Manipular ordenação
+        function handleSort(e, dataToSort = null) {
+            const sortValue = e ? e.target.value : sortSelect.value;
+            const data = dataToSort || currentData;
+            
+            let sortedData = [...data];
+            
+            switch(sortValue) {
+                case 'name':
+                    sortedData.sort((a, b) => a.activity.localeCompare(b.activity));
+                    break;
+                case 'risk':
+                    const riskOrder = { 'Alto': 1, 'Médio': 2, 'Baixo': 3 };
+                    sortedData.sort((a, b) => riskOrder[a.riskLevel] - riskOrder[b.riskLevel]);
+                    break;
+                case 'area':
+                    sortedData.sort((a, b) => a.area.localeCompare(b.area));
+                    break;
+            }
+            
+            displayResults(sortedData);
+        }
+
+        // Exibir resultados
+        function displayResults(data) {
+            resultsGrid.innerHTML = '';
+            
+            if (data.length === 0) {
+                resultsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>Nenhuma atividade encontrada</h3>
+                        <p>Tente ajustar os filtros ou termos de busca</p>
+                    </div>
+                `;
+                resultsCount.textContent = '0 atividades encontradas';
+                return;
+            }
+            
+            resultsCount.textContent = `${data.length} atividade(s) encontrada(s)`;
+            
+            data.forEach(item => {
+                const riskCard = document.createElement('div');
+                riskCard.className = 'risk-card';
+                riskCard.innerHTML = `
+                    <div class="risk-header">
+                        <span class="risk-level risk-${item.riskLevel.toLowerCase()}">Risco ${item.riskLevel}</span>
+                        <span class="risk-score">Pontuação: ${item.score}</span>
+                    </div>
+                    <div class="risk-content">
+                        <div class="risk-title">${item.activity}</div>
+                        <div class="risk-details">${item.risk}</div>
+                        <div class="risk-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
+                            <span><i class="fas fa-tools"></i> ${item.area}</span>
+                        </div>
+                    </div>
+                    <div class="risk-actions">
+                        <button class="action-btn view-details" data-id="${item.id}">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </button>
+                        <button class="action-btn toggle-favorite" data-id="${item.id}">
+                            <i class="far fa-star"></i> Favoritar
+                        </button>
+                    </div>
+                `;
+                
+                resultsGrid.appendChild(riskCard);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.dataset.id;
+                    showRiskDetails(itemId);
+                });
+            });
+            
+            document.querySelectorAll('.toggle-favorite').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.dataset.id;
+                    toggleFavorite(itemId, this);
+                });
+            });
+            
+            // Atualizar ícones de favoritos
+            updateFavoriteIcons();
+        }
+
+        // Mostrar detalhes do risco
+        function showRiskDetails(itemId) {
+            const item = riskData.find(i => i.id === itemId);
+            if (!item) return;
+            
+            // Adicionar ao histórico de recentes
+            if (!recent.includes(itemId)) {
+                recent.unshift(itemId);
+                if (recent.length > 10) recent.pop();
+                localStorage.setItem('recent', JSON.stringify(recent));
+            }
+            
+            modalTitle.textContent = item.activity;
+            
+            modalBody.innerHTML = `
+                <div class="risk-detail-section">
+                    <h3>Informações Gerais</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">ID</div>
+                            <div class="detail-value">${item.id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Área</div>
+                            <div class="detail-value">${item.area}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Localização</div>
+                            <div class="detail-value">${item.location}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Atividade</div>
+                            <div class="detail-value">${item.activity}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="risk-detail-section">
+                    <h3>Avaliação de Risco</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Risco Identificado</div>
+                            <div class="detail-value">${item.risk}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Frequência</div>
+                            <div class="detail-value">${item.frequency}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Gravidade</div>
+                            <div class="detail-value">${item.severity}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Pontuação</div>
+                            <div class="detail-value">${item.score}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Nível de Risco</div>
+                            <div class="detail-value"><span class="risk-level risk-${item.riskLevel.toLowerCase()}">${item.riskLevel}</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="risk-detail-section">
+                    <h3>Medidas de Controle</h3>
+                    <div class="detail-item">
+                        <div class="detail-label">EPIs Recomendados</div>
+                        <div class="detail-value">${item.ppe}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Controles de Engenharia/Administrativos</div>
+                        <div class="detail-value">${item.controls}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Legislação Aplicável</div>
+                        <div class="detail-value">${item.legislation}</div>
+                    </div>
+                </div>
+            `;
+            
+            riskModal.style.display = 'block';
+        }
+
+        // Alternar favorito
+        function toggleFavorite(itemId, button) {
+            const index = favorites.indexOf(itemId);
+            
+            if (index === -1) {
+                favorites.push(itemId);
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-star"></i> Favoritado';
+                }
+            } else {
+                favorites.splice(index, 1);
+                if (button) {
+                    button.innerHTML = '<i class="far fa-star"></i> Favoritar';
+                }
+            }
+            
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            updateFavoriteIcons();
+        }
+
+        // Atualizar ícones de favoritos
+        function updateFavoriteIcons() {
+            document.querySelectorAll('.toggle-favorite').forEach(button => {
+                const itemId = button.dataset.id;
+                if (favorites.includes(itemId)) {
+                    button.innerHTML = '<i class="fas fa-star"></i> Favoritado';
+                } else {
+                    button.innerHTML = '<i class="far fa-star"></i> Favoritar';
+                }
+            });
+        }
+
+        // Manipular navegação
+        function handleNavigation(page) {
+            switch(page) {
+                case 'search':
+                    // Já estamos na página de busca
+                    break;
+                case 'favorites':
+                    showFavorites();
+                    break;
+                case 'recent':
+                    showRecent();
+                    break;
+                case 'about':
+                    showAbout();
+                    break;
+            }
+        }
+
+        // Mostrar favoritos
+        function showFavorites() {
+            const favoriteData = riskData.filter(item => favorites.includes(item.id));
+            displayResults(favoriteData);
+            document.querySelector('.results-header h2').textContent = 'Atividades Favoritas';
+        }
+
+        // Mostrar recentes
+        function showRecent() {
+            const recentData = riskData.filter(item => recent.includes(item.id));
+            // Ordenar pela ordem em que foram visualizados (mais recentes primeiro)
+            recentData.sort((a, b) => recent.indexOf(a.id) - recent.indexOf(b.id));
+            displayResults(recentData);
+            document.querySelector('.results-header h2').textContent = 'Atividades Recentes';
+        }
+
+        // Mostrar sobre
+        function showAbout() {
+            resultsGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Matriz de Risco Digital</h3>
+                    <p>Sistema desenvolvido para facilitar a consulta de riscos ocupacionais na fábrica de cimento.</p>
+                    <p>Versão 1.0</p>
+                </div>
+            `;
+            document.querySelector('.results-header h2').textContent = 'Sobre o Sistema';
+        }
+    </script>
+</body>
+</html>
